@@ -6,7 +6,7 @@ Note that these sandboxes, while isolated enough to be used for testing, are not
 
 ## API Docs
 
-You'll find API documentation at http://rgrove.github.com/sandbox/docs/
+You'll find API documentation at [http://rgrove.github.com/sandbox/docs/](http://rgrove.github.com/sandbox/docs/)
 
 ## Example
 
@@ -68,7 +68,7 @@ You'll find API documentation at http://rgrove.github.com/sandbox/docs/
 
 ## License
 
-Copyright (c) 2010 Ryan Grove (ryan@wonko.com)
+Copyright (c) 2010 Ryan Grove <[ryan@wonko.com](mailto:ryan@wonko.com)>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
