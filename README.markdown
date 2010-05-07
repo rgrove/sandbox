@@ -62,6 +62,9 @@ You'll find API documentation at [http://rgrove.github.com/sandbox/docs/](http:/
 
             alert('Ninjas are ' + sandbox.getEnvValue('ninjas'));
 
+            // Clean up the sandbox.
+            sandbox.destroy();
+
             // See the API docs for even more useful stuff.
         });
     });
