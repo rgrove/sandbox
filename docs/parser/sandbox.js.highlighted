@@ -1,0 +1,373 @@
+<div class="highlight"><pre><span class="nx">YUI</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;gallery-sandbox&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">Y</span><span class="p">)</span> <span class="p">{</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * &lt;p&gt;</span>
+<span class="cm"> * Simplifies the process of creating isolated iframe sandboxes in which to</span>
+<span class="cm"> * evaluate JavaScript code for tasks like profiling or unit testing.</span>
+<span class="cm"> * &lt;/p&gt;</span>
+<span class="cm"> *</span>
+<span class="cm"> * &lt;p&gt;</span>
+<span class="cm"> * Note that these sandboxes, while isolated enough to be used for testing, are</span>
+<span class="cm"> * not secure. They should be used only to run trusted code, and are not</span>
+<span class="cm"> * intended to be used to execute arbitrary untrusted JavaScript.</span>
+<span class="cm"> * &lt;/p&gt;</span>
+<span class="cm"> *</span>
+<span class="cm"> * @module gallery-sandbox</span>
+<span class="cm"> */</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * &lt;p&gt;</span>
+<span class="cm"> * Creates a new sandbox with the specified configuration. Since sandbox</span>
+<span class="cm"> * creation may be asynchronous in some browsers, wait for the</span>
+<span class="cm"> * &lt;code&gt;ready&lt;/code&gt; event before using the sandbox.</span>
+<span class="cm"> * &lt;/p&gt;</span>
+<span class="cm"> *</span>
+<span class="cm"> * &lt;p&gt;</span>
+<span class="cm"> * The &lt;i&gt;config&lt;/i&gt; argument supports the following properties:</span>
+<span class="cm"> * &lt;/p&gt;</span>
+<span class="cm"> *</span>
+<span class="cm"> * &lt;dl&gt;</span>
+<span class="cm"> *   &lt;dt&gt;&lt;strong&gt;bootstrapYUI (Boolean)&lt;/strong&gt;&lt;/dt&gt;</span>
+<span class="cm"> *   &lt;dd&gt;</span>
+<span class="cm"> *     If &lt;code&gt;true&lt;/code&gt;, YUI3 Core and Loader will automatically be</span>
+<span class="cm"> *     bootstrapped into the sandbox.</span>
+<span class="cm"> *   &lt;/dd&gt;</span>
+<span class="cm"> * &lt;/dl&gt;</span>
+<span class="cm"> *</span>
+<span class="cm"> * @class Sandbox</span>
+<span class="cm"> * @param {Object} config configuration object</span>
+<span class="cm"> * @constructor</span>
+<span class="cm"> */</span>
+
+<span class="kd">var</span> <span class="nx">GlobalEnv</span>  <span class="o">=</span> <span class="nx">YUI</span><span class="p">.</span><span class="nx">namespace</span><span class="p">(</span><span class="s1">&#39;Env.Sandbox&#39;</span><span class="p">),</span>
+    <span class="nx">Lang</span>       <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">Lang</span><span class="p">,</span>
+
+    <span class="nx">config</span>     <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">config</span><span class="p">,</span>
+    <span class="nx">body</span>       <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">doc</span><span class="p">.</span><span class="nx">body</span><span class="p">,</span>
+    <span class="nx">isFunction</span> <span class="o">=</span> <span class="nx">Lang</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">,</span>
+
+    <span class="nx">EVT_READY</span>  <span class="o">=</span> <span class="s1">&#39;ready&#39;</span><span class="p">,</span>
+
+<span class="nx">Sandbox</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/**</span>
+<span class="cm">     * Fired when the sandbox has been initialized and is ready to use.</span>
+<span class="cm">     * Attempts to use the sandbox before this event has fired may fail in</span>
+<span class="cm">     * certain browsers (particularly Firefox). Subscribers that attach after</span>
+<span class="cm">     * this event has fired will be executed instantly.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @event ready</span>
+<span class="cm">     */</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="nx">EVT_READY</span><span class="p">,</span> <span class="p">{</span><span class="nx">fireOnce</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">_id</span>    <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">guid</span><span class="p">(</span><span class="s1">&#39;sandbox-&#39;</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">merge</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">,</span> <span class="nx">config</span> <span class="o">||</span> <span class="p">{});</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">_env</span> <span class="o">=</span> <span class="nx">GlobalEnv</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nx">log</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span> <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">_createIframe</span><span class="p">();</span>
+<span class="p">};</span>
+
+<span class="nx">Y</span><span class="p">.</span><span class="nx">augment</span><span class="p">(</span><span class="nx">Sandbox</span><span class="p">,</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">EventTarget</span><span class="p">);</span>
+
+<span class="nx">Y</span><span class="p">.</span><span class="nx">mix</span><span class="p">(</span><span class="nx">Sandbox</span><span class="p">.</span><span class="nx">prototype</span><span class="p">,</span> <span class="p">{</span>
+    <span class="c1">// -- Public Properties ----------------------------------------------------</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Sandbox configuration.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @property config</span>
+<span class="cm">     * @type Object</span>
+<span class="cm">     */</span>
+    <span class="nx">config</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">bootstrapYUI</span><span class="o">:</span> <span class="kc">false</span>
+    <span class="p">},</span>
+
+    <span class="c1">// -- Public Methods -------------------------------------------------------</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Clears any profiling data that has been gathered by this sandbox.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @method clearProfile</span>
+<span class="cm">     */</span>
+    <span class="nx">clearProfile</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">env</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_env</span><span class="p">;</span>
+
+        <span class="k">delete</span> <span class="nx">env</span><span class="p">.</span><span class="nx">done</span><span class="p">;</span>
+        <span class="k">delete</span> <span class="nx">env</span><span class="p">.</span><span class="nx">endTime</span><span class="p">;</span>
+        <span class="k">delete</span> <span class="nx">env</span><span class="p">.</span><span class="nx">runs</span><span class="p">;</span>
+        <span class="k">delete</span> <span class="nx">env</span><span class="p">.</span><span class="nx">startTime</span><span class="p">;</span>
+    <span class="p">},</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Runs the specified JavaScript in the sandbox as many times as possible</span>
+<span class="cm">     * within the specified duration and returns the number of completed runs.</span>
+<span class="cm">     * In the script, be sure to call &lt;code&gt;done()&lt;/code&gt; to indicate</span>
+<span class="cm">     * completion, or the runs will not be counted.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @method count</span>
+<span class="cm">     * @param {Function|String} script JavaScript code or a function to execute</span>
+<span class="cm">     *   in the sandbox (note that functions will be cast to strings, so they</span>
+<span class="cm">     *   will not carry their execution context with them)</span>
+<span class="cm">     * @param {Number} duration duration to measure in milliseconds</span>
+<span class="cm">     * @return {Number} number of runs completed within the specified duration</span>
+<span class="cm">     */</span>
+    <span class="nx">count</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">script</span><span class="p">,</span> <span class="nx">duration</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">env</span>       <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_env</span><span class="p">,</span>
+            <span class="nx">guid</span>      <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">guid</span><span class="p">(</span><span class="s1">&#39;count-&#39;</span><span class="p">),</span>
+            <span class="nx">iframeWin</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_iframe</span><span class="p">.</span><span class="nx">contentWindow</span><span class="p">,</span>
+            <span class="nx">now</span><span class="p">,</span>
+            <span class="nx">runs</span><span class="p">,</span>
+            <span class="nx">start</span><span class="p">;</span>
+
+        <span class="nx">script</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_getCountedScript</span><span class="p">(</span><span class="nx">script</span><span class="p">,</span> <span class="nx">guid</span><span class="p">);</span>
+        <span class="nx">start</span>  <span class="o">=</span> <span class="nx">now</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">();</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="nx">now</span> <span class="o">-</span> <span class="nx">start</span> <span class="o">&lt;</span> <span class="nx">duration</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">env</span><span class="p">.</span><span class="nx">run</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">iframeWin</span><span class="p">,</span> <span class="nx">script</span><span class="p">);</span>
+            <span class="nx">now</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="nx">runs</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getEnvValue</span><span class="p">(</span><span class="nx">guid</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">deleteEnvValue</span><span class="p">(</span><span class="nx">guid</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nx">runs</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">},</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Deletes a named value from the shared sandbox environment.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @method deleteEnvValue</span>
+<span class="cm">     * @param {String} key</span>
+<span class="cm">     */</span>
+    <span class="nx">deleteEnvValue</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">!==</span> <span class="s1">&#39;run&#39;</span> <span class="o">&amp;&amp;</span> <span class="nx">Y</span><span class="p">.</span><span class="nb">Object</span><span class="p">.</span><span class="nx">owns</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_env</span><span class="p">,</span> <span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">_env</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Cleans up and destroys this sandbox and its associated iframe. After</span>
+<span class="cm">     * calling this method, the sandbox will no longer be usable.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @method destroy</span>
+<span class="cm">     */</span>
+    <span class="nx">destroy</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">delete</span> <span class="nx">GlobalEnv</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">_id</span><span class="p">];</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_iframe</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">_iframe</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_iframe</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">.</span><span class="nx">removeChild</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_iframe</span><span class="p">);</span>
+            <span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">_iframe</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Gets a named value from the shared sandbox environment. This can be used</span>
+<span class="cm">     * to pass data between the sandbox and the parent. Code running in the</span>
+<span class="cm">     * sandbox can access these values as properties on the &lt;code&gt;sandbox&lt;/code&gt;</span>
+<span class="cm">     * object.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @method getEnvValue</span>
+<span class="cm">     * @param {String} key</span>
+<span class="cm">     * @return {mixed} named value, or &lt;code&gt;undefined&lt;/code&gt; if not found</span>
+<span class="cm">     */</span>
+    <span class="nx">getEnvValue</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">Y</span><span class="p">.</span><span class="nb">Object</span><span class="p">.</span><span class="nx">owns</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_env</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="o">?</span> <span class="k">this</span><span class="p">.</span><span class="nx">_env</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">:</span> <span class="kc">undefined</span><span class="p">;</span>
+    <span class="p">},</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * &lt;p&gt;</span>
+<span class="cm">     * Runs the specified JavaScript in the sandbox and creates timestamps when</span>
+<span class="cm">     * it starts and when it finishes. In the script, be sure to call</span>
+<span class="cm">     * &lt;code&gt;done()&lt;/code&gt; to record the completion time. Time values will be</span>
+<span class="cm">     * made available as environment values under the keys</span>
+<span class="cm">     * &lt;code&gt;startTime&lt;/code&gt; and &lt;code&gt;endTime&lt;/code&gt;.</span>
+<span class="cm">     * &lt;/p&gt;</span>
+<span class="cm">     *</span>
+<span class="cm">     * &lt;p&gt;</span>
+<span class="cm">     * If the executed JavaScript performs asynchronous operations, this method</span>
+<span class="cm">     * may return before the script has finished executing. Pass in a callback</span>
+<span class="cm">     * to be notified when the script has indicated its completion. The callback</span>
+<span class="cm">     * will receive as an argument an object containing &lt;code&gt;startTime&lt;/code&gt;,</span>
+<span class="cm">     * &lt;code&gt;endTime&lt;/code&gt;, and &lt;code&gt;duration&lt;/code&gt; properties.</span>
+<span class="cm">     * &lt;/p&gt;</span>
+<span class="cm">     *</span>
+<span class="cm">     * @method profile</span>
+<span class="cm">     * @param {Function|String} script JavaScript code or a function to execute</span>
+<span class="cm">     *   in the sandbox (note that functions will be cast to strings, so they</span>
+<span class="cm">     *   will not carry their execution context with them)</span>
+<span class="cm">     * @param {Function} callback (optional) callback to execute when the script</span>
+<span class="cm">     *   has indicated completion</span>
+<span class="cm">     * @return {mixed} passes through the return value of the executed code</span>
+<span class="cm">     */</span>
+    <span class="nx">profile</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">script</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">env</span>       <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_env</span><span class="p">,</span>
+            <span class="nx">guid</span>      <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">guid</span><span class="p">(</span><span class="s1">&#39;profile-&#39;</span><span class="p">),</span>
+            <span class="nx">iframeWin</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_iframe</span><span class="p">.</span><span class="nx">contentWindow</span><span class="p">,</span>
+            <span class="nx">poll</span><span class="p">;</span>
+
+        <span class="k">this</span><span class="p">.</span><span class="nx">clearProfile</span><span class="p">();</span>
+
+        <span class="nx">script</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_getProfiledScript</span><span class="p">(</span><span class="nx">script</span><span class="p">,</span> <span class="nx">guid</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">poll</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">later</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">pollInterval</span> <span class="o">||</span> <span class="mi">15</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">profileData</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getEnvValue</span><span class="p">(</span><span class="nx">guid</span><span class="p">),</span>
+                    <span class="nx">endTime</span>     <span class="o">=</span> <span class="nx">profileData</span> <span class="o">&amp;&amp;</span> <span class="nx">profileData</span><span class="p">.</span><span class="nx">endTime</span><span class="p">,</span>
+                    <span class="nx">startTime</span><span class="p">;</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="nx">endTime</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">poll</span><span class="p">.</span><span class="nx">cancel</span><span class="p">();</span>
+
+                    <span class="nx">startTime</span> <span class="o">=</span> <span class="nx">profileData</span><span class="p">.</span><span class="nx">startTime</span><span class="p">;</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">deleteEnvValue</span><span class="p">(</span><span class="nx">guid</span><span class="p">);</span>
+
+                    <span class="nx">callback</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">win</span><span class="p">,</span> <span class="p">{</span>
+                        <span class="nx">duration</span> <span class="o">:</span> <span class="nx">endTime</span> <span class="o">-</span> <span class="nx">startTime</span><span class="p">,</span>
+                        <span class="nx">endTime</span>  <span class="o">:</span> <span class="nx">endTime</span><span class="p">,</span>
+                        <span class="nx">startTime</span><span class="o">:</span> <span class="nx">startTime</span>
+                    <span class="p">});</span>
+                <span class="p">}</span>
+            <span class="p">},</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nx">env</span><span class="p">.</span><span class="nx">run</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">iframeWin</span><span class="p">,</span> <span class="nx">script</span><span class="p">);</span>
+    <span class="p">},</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * &lt;p&gt;</span>
+<span class="cm">     * Runs the specified JavaScript in the sandbox.</span>
+<span class="cm">     * &lt;/p&gt;</span>
+<span class="cm">     *</span>
+<span class="cm">     * &lt;p&gt;</span>
+<span class="cm">     * If the executed JavaScript performs asynchronous operations, this method</span>
+<span class="cm">     * may return before the script has finished executing. Pass in a callback</span>
+<span class="cm">     * to be notified when the script has indicated its completion, and be sure</span>
+<span class="cm">     * to call &lt;code&gt;done()&lt;/code&gt; from the script so that completion can be</span>
+<span class="cm">     * detected.</span>
+<span class="cm">     * &lt;/p&gt;</span>
+<span class="cm">     *</span>
+<span class="cm">     * @method run</span>
+<span class="cm">     * @param {Function|String} script JavaScript code or a function to execute</span>
+<span class="cm">     *   in the sandbox (note that functions will be cast to strings, so they</span>
+<span class="cm">     *   will not carry their execution context with them)</span>
+<span class="cm">     * @param {Function} callback (optional) callback to execute when the script</span>
+<span class="cm">     *   has indicated completion</span>
+<span class="cm">     * @return {mixed} passes through the return value of the executed code</span>
+<span class="cm">     */</span>
+    <span class="nx">run</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">script</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">guid</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">guid</span><span class="p">(</span><span class="s1">&#39;run-&#39;</span><span class="p">),</span>
+            <span class="nx">poll</span><span class="p">;</span>
+
+        <span class="k">this</span><span class="p">.</span><span class="nx">setEnvValue</span><span class="p">(</span><span class="nx">guid</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">poll</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">later</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">pollInterval</span> <span class="o">||</span> <span class="mi">15</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">getEnvValue</span><span class="p">(</span><span class="nx">guid</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">poll</span><span class="p">.</span><span class="nx">cancel</span><span class="p">();</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">deleteEnvValue</span><span class="p">(</span><span class="nx">guid</span><span class="p">);</span>
+                    <span class="nx">callback</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">win</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">},</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_env</span><span class="p">.</span><span class="nx">run</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_iframe</span><span class="p">.</span><span class="nx">contentWindow</span><span class="p">,</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">_getScript</span><span class="p">(</span><span class="nx">script</span><span class="p">,</span> <span class="nx">guid</span><span class="p">));</span>
+    <span class="p">},</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Sets a named value on the shared sandbox environment object. This can be</span>
+<span class="cm">     * used to pass data between the sandbox and the parent. Code running in the</span>
+<span class="cm">     * sandbox can access these values as properties on the &lt;code&gt;sandbox&lt;/code&gt;</span>
+<span class="cm">     * object.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @method setEnvValue</span>
+<span class="cm">     * @param {String} key</span>
+<span class="cm">     * @param {mixed} value</span>
+<span class="cm">     * @return {mixed} value that was set</span>
+<span class="cm">     */</span>
+    <span class="nx">setEnvValue</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">===</span> <span class="s1">&#39;run&#39;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// This key is off limits.</span>
+            <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_env</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+    <span class="p">},</span>
+
+    <span class="c1">// -- Protected Methods ----------------------------------------------------</span>
+    <span class="nx">_createIframe</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">iframe</span>    <span class="o">=</span> <span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">Y</span><span class="p">.</span><span class="nx">DOM</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s1">&#39;&lt;iframe id=&quot;&#39;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span> <span class="o">+</span> <span class="s1">&#39;&quot; style=&quot;display:none&quot;/&gt;&#39;</span><span class="p">)),</span>
+            <span class="nx">iframeDoc</span> <span class="o">=</span> <span class="nx">iframe</span><span class="p">.</span><span class="nx">contentWindow</span><span class="p">.</span><span class="nb">document</span><span class="p">,</span>
+            <span class="nx">poll</span><span class="p">;</span>
+
+        <span class="c1">// Based on a technique described by Dean Edwards:</span>
+        <span class="c1">// http://dean.edwards.name/weblog/2006/11/sandbox/</span>
+        <span class="nx">iframeDoc</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span>
+            <span class="s1">&#39;&lt;!DOCTYPE html&gt;&#39;</span> <span class="o">+</span>
+            <span class="s1">&#39;&lt;html&gt;&#39;</span> <span class="o">+</span>
+            <span class="s1">&#39;&lt;head&gt;&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;&lt;title&gt;&#39;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span> <span class="o">+</span> <span class="s1">&#39;&lt;/title&gt;&#39;</span> <span class="o">+</span>
+            <span class="s1">&#39;&lt;/head&gt;&#39;</span> <span class="o">+</span>
+            <span class="s1">&#39;&lt;body&gt;&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;&lt;script&gt;&#39;</span> <span class="o">+</span>
+                    <span class="s1">&#39;var sandbox = parent.YUI.Env.Sandbox[&quot;&#39;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span> <span class="o">+</span> <span class="s1">&#39;&quot;];&#39;</span> <span class="o">+</span>
+                    <span class="s1">&#39;sandbox.run = function (script) { return window.eval(script); };&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;&lt;\/script&gt;&#39;</span>
+        <span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">bootstrapYUI</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">iframeDoc</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span>
+                <span class="s1">&#39;&lt;script src=&quot;&#39;</span> <span class="o">+</span> <span class="nx">config</span><span class="p">.</span><span class="nx">base</span> <span class="o">+</span> <span class="s1">&#39;yui/yui-min.js&quot;&gt;&lt;\/script&gt;&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;&lt;script src=&quot;&#39;</span> <span class="o">+</span> <span class="nx">config</span><span class="p">.</span><span class="nx">base</span> <span class="o">+</span> <span class="s1">&#39;loader/loader-min.js&quot;&gt;&lt;\/script&gt;&#39;</span>
+            <span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="nx">iframeDoc</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span>
+                <span class="s1">&#39;&lt;script&gt;sandbox.ready = true;&lt;/script&gt;&#39;</span> <span class="o">+</span> <span class="c1">// needed for Firefox</span>
+            <span class="s1">&#39;&lt;/body&gt;&#39;</span> <span class="o">+</span>
+            <span class="s1">&#39;&lt;/html&gt;&#39;</span>
+        <span class="p">);</span>
+
+        <span class="c1">// Allows window.onload to fire.</span>
+        <span class="nx">iframeDoc</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
+
+        <span class="k">this</span><span class="p">.</span><span class="nx">_iframe</span> <span class="o">=</span> <span class="nx">iframe</span><span class="p">;</span>
+
+        <span class="nx">poll</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">later</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">pollInterval</span> <span class="o">||</span> <span class="mi">15</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">getEnvValue</span><span class="p">(</span><span class="s1">&#39;ready&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">poll</span><span class="p">.</span><span class="nx">cancel</span><span class="p">();</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span><span class="nx">EVT_READY</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">},</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+    <span class="p">},</span>
+
+    <span class="nx">_getCountedScript</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">script</span><span class="p">,</span> <span class="nx">guid</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s1">&#39;(function () {&#39;</span> <span class="o">+</span>
+                   <span class="s1">&#39;var done = function () { sandbox[&quot;&#39;</span> <span class="o">+</span> <span class="nx">guid</span> <span class="o">+</span> <span class="s1">&#39;&quot;] += 1 };&#39;</span> <span class="o">+</span>
+                   <span class="s1">&#39;sandbox[&quot;&#39;</span> <span class="o">+</span> <span class="nx">guid</span> <span class="o">+</span> <span class="s1">&#39;&quot;] = sandbox[&quot;&#39;</span> <span class="o">+</span> <span class="nx">guid</span> <span class="o">+</span> <span class="s1">&#39;&quot;] || 0;&#39;</span> <span class="o">+</span>
+                   <span class="p">(</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">script</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="nx">script</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;());&#39;</span> <span class="o">:</span> <span class="nx">script</span><span class="p">)</span> <span class="o">+</span>
+               <span class="s1">&#39;}());&#39;</span><span class="p">;</span>
+    <span class="p">},</span>
+
+    <span class="nx">_getProfiledScript</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">script</span><span class="p">,</span> <span class="nx">guid</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s1">&#39;(function () {&#39;</span> <span class="o">+</span>
+                   <span class="s1">&#39;var done = function () { sandbox[&quot;&#39;</span> <span class="o">+</span> <span class="nx">guid</span> <span class="o">+</span> <span class="s1">&#39;&quot;].endTime = new Date().getTime(); };&#39;</span> <span class="o">+</span>
+                   <span class="s1">&#39;sandbox[&quot;&#39;</span> <span class="o">+</span> <span class="nx">guid</span> <span class="o">+</span> <span class="s1">&#39;&quot;] = {startTime: new Date().getTime()};&#39;</span> <span class="o">+</span>
+                   <span class="p">(</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">script</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="nx">script</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;());&#39;</span> <span class="o">:</span> <span class="nx">script</span><span class="p">)</span> <span class="o">+</span>
+               <span class="s1">&#39;}());&#39;</span><span class="p">;</span>
+    <span class="p">},</span>
+
+    <span class="nx">_getScript</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">script</span><span class="p">,</span> <span class="nx">guid</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s1">&#39;(function () {&#39;</span> <span class="o">+</span>
+                   <span class="s1">&#39;var done = function () { sandbox[&quot;&#39;</span> <span class="o">+</span> <span class="nx">guid</span> <span class="o">+</span> <span class="s1">&#39;&quot;] = true; };&#39;</span> <span class="o">+</span>
+                   <span class="p">(</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">script</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="nx">script</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;());&#39;</span> <span class="o">:</span> <span class="nx">script</span><span class="p">)</span> <span class="o">+</span>
+               <span class="s1">&#39;}());&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">},</span> <span class="kc">true</span><span class="p">);</span>
+
+<span class="nx">Y</span><span class="p">.</span><span class="nx">Sandbox</span> <span class="o">=</span> <span class="nx">Sandbox</span><span class="p">;</span>
+
+<span class="p">},</span> <span class="s1">&#39;@VERSION@&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">requires</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;dom-base&#39;</span><span class="p">,</span> <span class="s1">&#39;event-custom-base&#39;</span><span class="p">,</span> <span class="s1">&#39;later&#39;</span><span class="p">]});</span>
+</pre></div>

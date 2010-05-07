@@ -1,0 +1,695 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: gallery-sandbox  Sandbox   (YUI Library)</title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
+        <h3>gallery-sandbox&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
+            &gt; <a href="./module_gallery-sandbox.html" title="gallery-sandbox">gallery-sandbox</a>
+                 &gt; Sandbox 
+                
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                    <h2>
+                        
+
+                        
+                        
+                            Class <b property="yui:name">Sandbox</b>
+                        <span class="extends">
+                        </span>
+
+                    </h2>
+                    <!-- class tree goes here -->
+                    
+                
+  
+
+                    <div class="summary description" property="yui:description">
+                        <p>
+Creates a new sandbox with the specified configuration. Since sandbox
+creation may be asynchronous in some browsers, wait for the
+<code>ready</code> event before using the sandbox.
+</p>
+<p>
+The <i>config</i> argument supports the following properties:
+</p>
+<dl>
+<dt><strong>bootstrapYUI (Boolean)</strong></dt>
+<dd>
+If <code>true</code>, YUI3 Core and Loader will automatically be
+bootstrapped into the sandbox.
+</dd>
+</dl>
+                    </div>
+
+                        <div class="section constructor details" rel="yui:constructor" resource="#constructor">
+                        <h3 id="constructor">Constructor</h3>
+                        <div class="content">
+                            <div class="detail">
+                                <strong property="yui:name">Sandbox</strong>
+                                <code>
+                                    (
+  
+                                        
+                                                
+                                                config
+                                    )
+                                </code>
+                                <div class="description">
+                                        <dl rel="yui:parameters">
+                                            <dt>Parameters:</dt>
+                                                <dd rel="yui:parameter">
+                                                    <code><span property="yui:name">config</span>
+                                                    &lt;<span property="yui:type">Object</span>&gt;
+                                                    </code>
+                                                    <span property="yui:description"> configuration object</span>
+                                                </dd>
+                                        </dl>
+                                    
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div rel="yui:properties" resource="#properties">
+                        <div class="section field details">
+                            <h3 id="properties">Properties</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:property" resource="#property_config">
+                                    <h4><a name="property_config" property="yui:name">config</a>
+                                        - <code><span property="yui:type">Object</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Sandbox configuration.
+                                        </div>
+                                    </div>
+     
+                                        
+
+
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div rel="yui:methods" resource="#methods">
+                        <div class="section method details">
+                            <h3 id="methods">Methods</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:method" resource="#method_clearProfile">
+                                    <h4>
+                                        <a name="method_clearProfile">clearProfile</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">clearProfile</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Clears any profiling data that has been gathered by this sandbox.
+                                        </div>
+
+                                        <div class="description">
+
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_count">
+                                    <h4>
+                                        <a name="method_count">count</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        Number
+                                            <strong property="yui:name">count</strong>
+                                           (
+                                                
+                                                        
+                                                         script
+                                                    
+                                                
+                                                        , 
+                                                         duration
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Runs the specified JavaScript in the sandbox as many times as possible
+within the specified duration and returns the number of completed runs.
+In the script, be sure to call <code>done()</code> to indicate
+completion, or the runs will not be counted.
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">script</span>
+                                                        &lt;<span property="yui:type">Function|String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> JavaScript code or a function to execute
+in the sandbox (note that functions will be cast to strings, so they
+will not carry their execution context with them)</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">duration</span>
+                                                        &lt;<span property="yui:type">Number</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> duration to measure in milliseconds</span>
+                                                        </dd>
+                                                </dl>
+
+                                                <dl>
+                                                    <dt>Returns:
+                                                    <code property="yui:return">
+                                                            Number
+                                                    </code></dt>
+                                                    <dd property="yui:returnInfo">number of runs completed within the specified duration</dd>
+                                                </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_deleteEnvValue">
+                                    <h4>
+                                        <a name="method_deleteEnvValue">deleteEnvValue</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">deleteEnvValue</strong>
+                                           (
+                                                
+                                                        
+                                                         key
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Deletes a named value from the shared sandbox environment.
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">key</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"></span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_destroy">
+                                    <h4>
+                                        <a name="method_destroy">destroy</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">destroy</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Cleans up and destroys this sandbox and its associated iframe. After
+calling this method, the sandbox will no longer be usable.
+                                        </div>
+
+                                        <div class="description">
+
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_getEnvValue">
+                                    <h4>
+                                        <a name="method_getEnvValue">getEnvValue</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        mixed
+                                            <strong property="yui:name">getEnvValue</strong>
+                                           (
+                                                
+                                                        
+                                                         key
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Gets a named value from the shared sandbox environment. This can be used
+to pass data between the sandbox and the parent. Code running in the
+sandbox can access these values as properties on the <code>sandbox</code>
+object.
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">key</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"></span>
+                                                        </dd>
+                                                </dl>
+
+                                                <dl>
+                                                    <dt>Returns:
+                                                    <code property="yui:return">
+                                                            mixed
+                                                    </code></dt>
+                                                    <dd property="yui:returnInfo">named value, or <code>undefined</code> if not found</dd>
+                                                </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_profile">
+                                    <h4>
+                                        <a name="method_profile">profile</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        mixed
+                                            <strong property="yui:name">profile</strong>
+                                           (
+                                                
+                                                        
+                                                         script
+                                                    
+                                                
+                                                        , 
+                                                         callback
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            <p>
+Runs the specified JavaScript in the sandbox and creates timestamps when
+it starts and when it finishes. In the script, be sure to call
+<code>done()</code> to record the completion time. Time values will be
+made available as environment values under the keys
+<code>startTime</code> and <code>endTime</code>.
+</p>
+<p>
+If the executed JavaScript performs asynchronous operations, this method
+may return before the script has finished executing. Pass in a callback
+to be notified when the script has indicated its completion. The callback
+will receive as an argument an object containing <code>startTime</code>,
+<code>endTime</code>, and <code>duration</code> properties.
+</p>
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">script</span>
+                                                        &lt;<span property="yui:type">Function|String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> JavaScript code or a function to execute
+in the sandbox (note that functions will be cast to strings, so they
+will not carry their execution context with them)</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">callback</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional) callback to execute when the script
+has indicated completion</span>
+                                                        </dd>
+                                                </dl>
+
+                                                <dl>
+                                                    <dt>Returns:
+                                                    <code property="yui:return">
+                                                            mixed
+                                                    </code></dt>
+                                                    <dd property="yui:returnInfo">passes through the return value of the executed code</dd>
+                                                </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_run">
+                                    <h4>
+                                        <a name="method_run">run</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        mixed
+                                            <strong property="yui:name">run</strong>
+                                           (
+                                                
+                                                        
+                                                         script
+                                                    
+                                                
+                                                        , 
+                                                         callback
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            <p>
+Runs the specified JavaScript in the sandbox.
+</p>
+<p>
+If the executed JavaScript performs asynchronous operations, this method
+may return before the script has finished executing. Pass in a callback
+to be notified when the script has indicated its completion, and be sure
+to call <code>done()</code> from the script so that completion can be
+detected.
+</p>
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">script</span>
+                                                        &lt;<span property="yui:type">Function|String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> JavaScript code or a function to execute
+in the sandbox (note that functions will be cast to strings, so they
+will not carry their execution context with them)</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">callback</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional) callback to execute when the script
+has indicated completion</span>
+                                                        </dd>
+                                                </dl>
+
+                                                <dl>
+                                                    <dt>Returns:
+                                                    <code property="yui:return">
+                                                            mixed
+                                                    </code></dt>
+                                                    <dd property="yui:returnInfo">passes through the return value of the executed code</dd>
+                                                </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_setEnvValue">
+                                    <h4>
+                                        <a name="method_setEnvValue">setEnvValue</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        mixed
+                                            <strong property="yui:name">setEnvValue</strong>
+                                           (
+                                                
+                                                        
+                                                         key
+                                                    
+                                                
+                                                        , 
+                                                         value
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Sets a named value on the shared sandbox environment object. This can be
+used to pass data between the sandbox and the parent. Code running in the
+sandbox can access these values as properties on the <code>sandbox</code>
+object.
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">key</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"></span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">value</span>
+                                                        &lt;<span property="yui:type">mixed</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"></span>
+                                                        </dd>
+                                                </dl>
+
+                                                <dl>
+                                                    <dt>Returns:
+                                                    <code property="yui:return">
+                                                            mixed
+                                                    </code></dt>
+                                                    <dd property="yui:returnInfo">value that was set</dd>
+                                                </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div rel="yui:events" resource="#events">
+                        <div class="section method details">
+                            <h3 id="events">Events</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:event" resource="#event_ready">
+                                    <h4>
+                                        <a name="event_ready">ready</a></h4>
+                                    <div class="detail">
+                                        <code>
+                                        
+                                        
+                                        
+                                            <strong property="yui:name">ready</strong>
+
+                                            (
+                                            )
+
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Fired when the sandbox has been initialized and is ready to use.
+Attempts to use the sandbox before this event has fired may fail in
+certain browsers (particularly Firefox). Subscribers that attach after
+this event has fired will be executed instantly.
+                                        </div>
+
+                                        <div class="description">
+
+
+
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div rel="yui:attributes" resource="#configattributes">
+
+                    </div>
+
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="module_gallery-sandbox.html" title="gallery-sandbox">gallery-sandbox</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="Sandbox.html" title="Sandbox">Sandbox</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class=""><a href="sandbox.js.html" title="sandbox.js">sandbox.js</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="propertyList" class="module">
+                        <h4>Properties</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#property_config" title="config">config</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="methodsList" class="module">
+                        <h4>Methods</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#method_clearProfile" title="clearProfile">clearProfile</a></li>
+                                <li class=""><a href="#method_count" title="count">count</a></li>
+                                <li class=""><a href="#method_deleteEnvValue" title="deleteEnvValue">deleteEnvValue</a></li>
+                                <li class=""><a href="#method_destroy" title="destroy">destroy</a></li>
+                                <li class=""><a href="#method_getEnvValue" title="getEnvValue">getEnvValue</a></li>
+                                <li class=""><a href="#method_profile" title="profile">profile</a></li>
+                                <li class=""><a href="#method_run" title="run">run</a></li>
+                                <li class=""><a href="#method_setEnvValue" title="setEnvValue">setEnvValue</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="eventsList" class="module">
+                        <h4>Events</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#event_ready" title="ready">ready</a></li>
+                        </ul>
+                    </div>
+
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+        Copyright &copy; 2010 Yahoo! Inc. All rights reserved.
+	</div>
+</div>
+<script type="text/javascript">
+
+    var ALL_YUI_PROPS = [{"url": "Sandbox.html#method_clearProfile", "access": "", "host": "Sandbox", "type": "method", "name": "clearProfile"}, {"url": "Sandbox.html#property_config", "access": "", "host": "Sandbox", "type": "property", "name": "config"}, {"url": "Sandbox.html#method_count", "access": "", "host": "Sandbox", "type": "method", "name": "count"}, {"url": "Sandbox.html#method_deleteEnvValue", "access": "", "host": "Sandbox", "type": "method", "name": "deleteEnvValue"}, {"url": "Sandbox.html#method_destroy", "access": "", "host": "Sandbox", "type": "method", "name": "destroy"}, {"url": "Sandbox.html#method_getEnvValue", "access": "", "host": "Sandbox", "type": "method", "name": "getEnvValue"}, {"url": "Sandbox.html#method_profile", "access": "", "host": "Sandbox", "type": "method", "name": "profile"}, {"url": "Sandbox.html#event_ready", "access": "", "host": "Sandbox", "type": "event", "name": "ready"}, {"url": "Sandbox.html#method_run", "access": "", "host": "Sandbox", "type": "method", "name": "run"}, {"url": "Sandbox.html#method_setEnvValue", "access": "", "host": "Sandbox", "type": "method", "name": "setEnvValue"}];
+</script>
+</body>
+</html>
